@@ -59,49 +59,61 @@ self.addEventListener("fetch", e => {
 
     if (req.mode === "navigate") {
         e.respondWith(
-            caches.match("index.html").then((cached) => cached || fetch(req))
+            fetch(req).then(async networkResp => {
+                const copy = networkResp.clone();
+                const cache = await caches.open(CACHE_NAME);
+                cache.put("index.html", copy);
+                console.log("[sw] HTML actualizado desde red");
+                return networkResp;
+            }).catch(() => {
+                console.warn("[sw] HTML desde caché (offline)");
+                return caches.match("index.html");
+            })
         );
         return;
     }
 
-    const isScript = req.destination === "script" || req.url.endsWith(".mjs") || (req.headers.get("accept") && req.headers.get("accept").includes("javascript"));
+    const isScript = req.destination === "script" || req.url.endsWith(".mjs") ||
+        (req.headers.get("accept") && req.headers.get("accept").includes("javascript"));
     if (isScript) {
-        console.log("[ws] En busca de actualizaciones para scripts");
         e.respondWith(
-            fetch(req).then((networkResp) => {
+            fetch(req).then(async networkResp => {
                 if (networkResp && networkResp.ok && req.url.startsWith("http")) {
                     const copy = networkResp.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-                    console.log("[ws] Scripts actualizados");
+                    const cache = await caches.open(CACHE_NAME);
+                    cache.put(req, copy);
+                    console.log("[sw] Script actualizado");
                 }
                 return networkResp;
-            }).catch(async () => {
-                return caches.match(req)
-                .then((cached) => {
-                    if(cached) {
-                        console.log("[ws] Scripts cargados desde la caché")
-                        return cached;
-                    }
-                    return new Response("", {
-                        status: 503,
-                        statusText: "Servicio no disponible",
-                    });
+            }).catch(() => {
+                console.warn("[sw] Script desde caché (offline)");
+                return caches.match(req);
+            })
+        );
+        return;
+    }
+
+    const isCSS = req.destination === "style" || req.url.endsWith(".css");
+    const isImage = req.destination === "image" || /\.(png|jpg|jpeg|gif|svg|webp)$/.test(req.url);
+
+    if (isCSS || isImage) {
+        e.respondWith(
+            caches.match(req).then(cached => {
+                if (cached) {
+                    console.log("[sw] Recurso cacheado ->", req.url);
+                    return cached;
+                }
+                return fetch(req).then(async networkResp => {
+                    const copy = networkResp.clone();
+                    const cache = await caches.open(CACHE_NAME);
+                    cache.put(req, copy);
+                    console.log("[sw] Nuevo recurso cacheado ->", req.url);
+                    return networkResp;
                 });
             })
         );
         return;
     }
 
-    e.respondWith(
-        caches.match(req).then((cached) => {
-            if (cached) return cached;
-            return fetch(req)
-            .then((networkResp) => {
-                return networkResp;
-            })
-            .catch(() => {
-                return caches.match("index.html");
-            });
-        })
-    );
+    e.respondWith(fetch(req).catch(() => caches.match(req)));
 });

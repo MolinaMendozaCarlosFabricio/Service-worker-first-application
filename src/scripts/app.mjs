@@ -8,13 +8,18 @@ let photos = [
   '/icons/missing_person_04.jpeg'
 ];
 
+loadFromLocalStorage();
+renderList();
+
 const form = document.getElementById("missing-form");
 const listContainer = document.getElementById("missing-list");
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  addMissingPerson();
-  form.reset();
+document.addEventListener("DOMContentLoaded", () => {
+  const btnSave = document.getElementById("btn-save");
+  btnSave.addEventListener("click", () => {
+    console.log("Botón guardar presionado");
+    addMissingPerson();
+    form.reset();
+  });
 });
 
 const saveToLocalStorage = () => {
@@ -58,6 +63,7 @@ const addMissingPerson = () => {
     missingPerson.photo = randomPhoto;
 
     missingPersons.push(missingPerson);
+    saveToLocalStorage();
     renderList();
   }
 };
@@ -86,6 +92,3 @@ window.deleteMissingPerson = (index) => {
   saveToLocalStorage();
   renderList();
 };
-
-loadFromLocalStorage();
-renderList();
