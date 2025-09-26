@@ -2,7 +2,7 @@
     "name": "Alerta Amber",
     "short_name": "Missing Persons",
     "description": "Página de anuncios de personas desaparecidas",
-    "start_url": "/index.html",
+    "start_url": "./index.html",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#2b8a3e",

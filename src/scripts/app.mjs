@@ -1,4 +1,12 @@
-import { MissingPerson } from "./models/MissingPerson.mjs";
+import { MissingPerson } from "../models/MissingPerson.mjs";
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/ws.js')
+            .then(reg => console.log("[main] Service Worker registrado con scope:", reg.scope))
+            .catch(err => console.error("[main] Error al registrar SW:", err));
+    });
+}
 
 let missingPersons = [];
 let photos = [
@@ -8,40 +16,41 @@ let photos = [
   '/icons/missing_person_04.jpeg'
 ];
 
+// Obtener elementos del DOM primero
+const form = document.getElementById("missing-form");
+const listContainer = document.getElementById("missing-list");
+const btnSave = document.getElementById("btn-save");
+
+// Ahora sí se pueden llamar estas funciones
 loadFromLocalStorage();
 renderList();
 
-const form = document.getElementById("missing-form");
-const listContainer = document.getElementById("missing-list");
-document.addEventListener("DOMContentLoaded", () => {
-  const btnSave = document.getElementById("btn-save");
-  btnSave.addEventListener("click", () => {
-    console.log("Botón guardar presionado");
-    addMissingPerson();
-    form.reset();
-  });
+btnSave.addEventListener("click", () => {
+  console.log("Botón guardar presionado");
+  addMissingPerson();
+  form.reset();
 });
 
 const saveToLocalStorage = () => {
   localStorage.setItem("missingPersons", JSON.stringify(missingPersons));
 };
 
-const loadFromLocalStorage = () => {
-  const data = localStorage.getItem("missingPersons");
-  if (data) {
-    missingPersons = JSON.parse(data).map(p => {
-      const person = new MissingPerson(
-        p.name,
-        p.age,
-        p.gender,
-        p.description,
-        p.date_disappearance
-      );
-      person.photo = p.photo;
-      return person;
-    });
-  }
-};
+function loadFromLocalStorage() {
+    const data = localStorage.getItem("missingPersons");
+    if (data) {
+        missingPersons = JSON.parse(data).map(p => {
+            const person = new MissingPerson(
+                p.name,
+                p.age,
+                p.gender,
+                p.description,
+                p.date_disappearance
+            );
+            person.photo = p.photo;
+            return person;
+        });
+    }
+}
 
 const addMissingPerson = () => {
   const name = document.getElementById("input-name").value;
@@ -68,7 +77,7 @@ const addMissingPerson = () => {
   }
 };
 
-const renderList = () => {
+function renderList(){
   listContainer.innerHTML = "";
   missingPersons.forEach((person, index) => {
     const card = document.createElement("div");
@@ -85,7 +94,7 @@ const renderList = () => {
 
     listContainer.appendChild(card);
   });
-};
+}
 
 window.deleteMissingPerson = (index) => {
   missingPersons.splice(index, 1);
