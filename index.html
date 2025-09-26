@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <h1>Personas Desaparecidas</h1>
+    </header>
+
+    <main>
+        <section class="form-section">
+            <h2>Registrar Persona</h2>
+            <form id="missing-form">
+                <input type="text" id="input-name" placeholder="Nombre" required>
+                <input type="number" id="input-age" placeholder="Edad" required>
+                <select id="input-gender" required>
+                    <option value="">Seleccionar género</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <textarea id="input-description" placeholder="Descripción" required></textarea>
+                <input type="date" id="input-date" required>
+                <button type="submit">Agregar</button>
+            </form>
+        </section>
+
+        <section class="list-section">
+            <h2>Listado de Personas</h2>
+            <div id="missing-list" class="cards-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2025 Registro de Personas Desaparecidas</p>
+    </footer>
+
+    <script type="module" src="/src/scripts/app.mjs"></script>
+    <script src="/src/scripts/connect_ws.mjs"></script>
+</body>
+</html>
