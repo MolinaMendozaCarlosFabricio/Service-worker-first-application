@@ -64,7 +64,7 @@ self.addEventListener('fetch', (event) => {
                 }
                 return networkResponse;
             } catch (err) {
-                console.warn('[sw] Offline, sirviendo desde caché ->', req.url);
+                console.log('[sw] Offline, sirviendo desde caché ->', req.url);
                 const cached = await caches.match(req);
                 return cached || new Response('Recurso no disponible', { status: 503 });
             }
