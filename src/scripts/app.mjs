@@ -16,12 +16,10 @@ let photos = [
   '/icons/missing_person_04.jpeg'
 ];
 
-// Obtener elementos del DOM primero
 const form = document.getElementById("missing-form");
 const listContainer = document.getElementById("missing-list");
 const btnSave = document.getElementById("btn-save");
 
-// Ahora sí se pueden llamar estas funciones
 loadFromLocalStorage();
 renderList();
 
